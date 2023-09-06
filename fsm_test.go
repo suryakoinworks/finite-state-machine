@@ -1,6 +1,7 @@
 package fsm
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -66,11 +67,14 @@ func TestEmptyTransition(t *testing.T) {
 		state: "open",
 	}
 
-	fsm, err := NewFSM(&machine, []string{"open", "close", "half_open"}, []Transition{})
+	states := []string{"open", "close", "half_open"}
+
+	fsm, err := NewFSM(&machine, states, []Transition{})
 
 	assert.NotNil(t, fsm)
 	assert.Nil(t, err)
 	assert.Error(t, fsm.Do("open"))
+	assert.Equal(t, states, fsm.AvailableStates())
 }
 
 func TestInvalidTransition(t *testing.T) {
@@ -100,9 +104,12 @@ func TestValidTransition(t *testing.T) {
 		{From: []string{"close"}, To: "open"},
 	})
 
+	fmt.Println(fsm.Actions())
+
 	assert.NotNil(t, fsm)
 	assert.Nil(t, err)
 	assert.Nil(t, fsm.Do("close"))
 	assert.Equal(t, machine.GetState(), fsm.GetCurrentState())
 	assert.Equal(t, machine.GetState(), "close")
+	assert.Equal(t, 4, len(fsm.Actions()))
 }

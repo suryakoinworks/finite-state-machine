@@ -11,13 +11,18 @@ type (
 	transitionable interface {
 		SetState(state string)
 		GetState() string
-		BeforeTransition(machine transitionable, transition string)
+		BeforeTransition(machine transitionable, action action)
 		AfterTransition(machine transitionable)
 	}
 
 	Transition struct {
 		To   string
 		From []string
+	}
+
+	action struct {
+		From string
+		To   string
 	}
 
 	Machine struct {
@@ -31,7 +36,7 @@ type (
 	}
 )
 
-func (f *Machine) BeforeTransition(machine transitionable, state string) {
+func (f *Machine) BeforeTransition(machine transitionable, action action) {
 }
 
 func (f *Machine) AfterTransition(machine transitionable) {
@@ -59,6 +64,21 @@ func NewFSM(machine transitionable, states []string, transtitions []Transition) 
 	return &fsm, nil
 }
 
+func (f *finiteStateMachine) AvailableStates() []string {
+	return f.states
+}
+
+func (f *finiteStateMachine) Actions() []action {
+	actions := make([]action, 0, len(f.transitions))
+	for _, i := range f.transitions {
+		for _, f := range i.From {
+			actions = append(actions, action{From: f, To: i.To})
+		}
+	}
+
+	return actions
+}
+
 func (f *finiteStateMachine) GetCurrentState() string {
 	f.lock.Lock()
 	defer f.lock.Unlock()
@@ -80,7 +100,7 @@ func (f *finiteStateMachine) Do(state string) error {
 			f.lock.Lock()
 			defer f.lock.Unlock()
 
-			f.machine.BeforeTransition(f.machine, state)
+			f.machine.BeforeTransition(f.machine, action{From: f.machine.GetState(), To: state})
 			f.machine.SetState(state)
 			f.machine.AfterTransition(f.machine)
 
