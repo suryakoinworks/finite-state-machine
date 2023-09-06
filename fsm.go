@@ -8,11 +8,11 @@ import (
 )
 
 type (
-	transitionable interface {
+	Transitionable interface {
 		SetState(state string)
 		GetState() string
-		BeforeTransition(machine transitionable, action action)
-		AfterTransition(machine transitionable)
+		BeforeTransition(machine Transitionable, action Action)
+		AfterTransition(machine Transitionable)
 	}
 
 	Transition struct {
@@ -20,26 +20,35 @@ type (
 		From []string
 	}
 
-	action struct {
+	Action struct {
 		From string
 		To   string
 	}
 
 	Machine struct {
+		State string
 	}
 
 	finiteStateMachine struct {
 		lock        sync.Mutex
-		machine     transitionable
+		machine     Transitionable
 		states      []string
 		transitions []Transition
 	}
 )
 
-func (f *Machine) BeforeTransition(machine transitionable, action action) {
+func (m *Machine) SetState(state string) {
+	m.State = state
 }
 
-func (f *Machine) AfterTransition(machine transitionable) {
+func (m *Machine) GetState() string {
+	return m.State
+}
+
+func (m *Machine) BeforeTransition(machine Transitionable, action Action) {
+}
+
+func (m *Machine) AfterTransition(machine Transitionable) {
 }
 
 /**
@@ -49,7 +58,7 @@ func (f *Machine) AfterTransition(machine transitionable) {
  *
  * Initiation will return error when the initial state is not valid
  */
-func NewFSM(machine transitionable, states []string, transtitions []Transition) (*finiteStateMachine, error) {
+func NewFSM(machine Transitionable, states []string, transtitions []Transition) (*finiteStateMachine, error) {
 	fsm := finiteStateMachine{
 		lock:        sync.Mutex{},
 		machine:     machine,
@@ -68,11 +77,11 @@ func (f *finiteStateMachine) AvailableStates() []string {
 	return f.states
 }
 
-func (f *finiteStateMachine) Actions() []action {
-	actions := make([]action, 0, len(f.transitions))
+func (f *finiteStateMachine) Actions() []Action {
+	actions := make([]Action, 0, len(f.transitions))
 	for _, i := range f.transitions {
 		for _, f := range i.From {
-			actions = append(actions, action{From: f, To: i.To})
+			actions = append(actions, Action{From: f, To: i.To})
 		}
 	}
 
@@ -97,7 +106,7 @@ func (f *finiteStateMachine) Do(state string) error {
 				return errors.New("invalid transition")
 			}
 
-			f.machine.BeforeTransition(f.machine, action{From: f.GetCurrentState(), To: state})
+			f.machine.BeforeTransition(f.machine, Action{From: f.GetCurrentState(), To: state})
 
 			f.lock.Lock()
 			defer f.lock.Unlock()

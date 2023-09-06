@@ -8,16 +8,7 @@ import (
 )
 
 type machine struct {
-	state string
 	Machine
-}
-
-func (f *machine) GetState() string {
-	return f.state
-}
-
-func (f *machine) SetState(state string) {
-	f.state = state
 }
 
 func TestInvalidFsmInitiate(t *testing.T) {
@@ -29,7 +20,9 @@ func TestInvalidFsmInitiate(t *testing.T) {
 
 func TestValidFsmInitiate(t *testing.T) {
 	machine := machine{
-		state: "open",
+		Machine: Machine{
+			State: "open",
+		},
 	}
 
 	fsm, err := NewFSM(&machine, []string{"open", "close", "half_open"}, []Transition{})
@@ -40,7 +33,9 @@ func TestValidFsmInitiate(t *testing.T) {
 
 func TestGetCurrentState(t *testing.T) {
 	machine := machine{
-		state: "open",
+		Machine: Machine{
+			State: "open",
+		},
 	}
 
 	fsm, err := NewFSM(&machine, []string{"open", "close", "half_open"}, []Transition{})
@@ -52,7 +47,9 @@ func TestGetCurrentState(t *testing.T) {
 
 func TestInvalidState(t *testing.T) {
 	machine := machine{
-		state: "open",
+		Machine: Machine{
+			State: "open",
+		},
 	}
 
 	fsm, err := NewFSM(&machine, []string{"open", "close", "half_open"}, []Transition{})
@@ -64,7 +61,9 @@ func TestInvalidState(t *testing.T) {
 
 func TestEmptyTransition(t *testing.T) {
 	machine := machine{
-		state: "open",
+		Machine: Machine{
+			State: "open",
+		},
 	}
 
 	states := []string{"open", "close", "half_open"}
@@ -79,7 +78,9 @@ func TestEmptyTransition(t *testing.T) {
 
 func TestInvalidTransition(t *testing.T) {
 	machine := machine{
-		state: "open",
+		Machine: Machine{
+			State: "open",
+		},
 	}
 
 	fsm, err := NewFSM(&machine, []string{"open", "close", "half_open"}, []Transition{
@@ -95,7 +96,9 @@ func TestInvalidTransition(t *testing.T) {
 
 func TestValidTransition(t *testing.T) {
 	machine := machine{
-		state: "open",
+		Machine: Machine{
+			State: "open",
+		},
 	}
 
 	fsm, err := NewFSM(&machine, []string{"open", "close", "half_open"}, []Transition{
