@@ -93,14 +93,15 @@ func (f *finiteStateMachine) Do(state string) error {
 
 	for _, t := range f.transitions {
 		if t.To == state {
-			if !slices.Contains(t.From, f.machine.GetState()) {
+			if !slices.Contains(t.From, f.GetCurrentState()) {
 				return errors.New("invalid transition")
 			}
+
+			f.machine.BeforeTransition(f.machine, action{From: f.GetCurrentState(), To: state})
 
 			f.lock.Lock()
 			defer f.lock.Unlock()
 
-			f.machine.BeforeTransition(f.machine, action{From: f.machine.GetState(), To: state})
 			f.machine.SetState(state)
 			f.machine.AfterTransition(f.machine)
 
@@ -112,7 +113,7 @@ func (f *finiteStateMachine) Do(state string) error {
 }
 
 func (f *finiteStateMachine) validateInitiation() bool {
-	if slices.Contains(f.states, f.machine.GetState()) {
+	if slices.Contains(f.states, f.GetCurrentState()) {
 		return true
 	}
 
