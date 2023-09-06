@@ -7,19 +7,19 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type machine struct {
+type switches struct {
 	Machine
 }
 
 func TestInvalidFsmInitiate(t *testing.T) {
-	fsm, err := NewFSM(&machine{}, []string{"open", "close", "half_open"}, []Transition{})
+	fsm, err := NewFSM(&switches{}, []string{"open", "close", "half_open"}, []Transition{})
 
 	assert.Nil(t, fsm)
 	assert.NotNil(t, err)
 }
 
 func TestValidFsmInitiate(t *testing.T) {
-	machine := machine{
+	machine := switches{
 		Machine: Machine{
 			State: "open",
 		},
@@ -32,7 +32,7 @@ func TestValidFsmInitiate(t *testing.T) {
 }
 
 func TestGetCurrentState(t *testing.T) {
-	machine := machine{
+	machine := switches{
 		Machine: Machine{
 			State: "open",
 		},
@@ -46,7 +46,7 @@ func TestGetCurrentState(t *testing.T) {
 }
 
 func TestInvalidState(t *testing.T) {
-	machine := machine{
+	machine := switches{
 		Machine: Machine{
 			State: "open",
 		},
@@ -60,7 +60,7 @@ func TestInvalidState(t *testing.T) {
 }
 
 func TestEmptyTransition(t *testing.T) {
-	machine := machine{
+	machine := switches{
 		Machine: Machine{
 			State: "open",
 		},
@@ -77,7 +77,7 @@ func TestEmptyTransition(t *testing.T) {
 }
 
 func TestInvalidTransition(t *testing.T) {
-	machine := machine{
+	machine := switches{
 		Machine: Machine{
 			State: "open",
 		},
@@ -95,7 +95,7 @@ func TestInvalidTransition(t *testing.T) {
 }
 
 func TestValidTransition(t *testing.T) {
-	machine := machine{
+	machine := switches{
 		Machine: Machine{
 			State: "open",
 		},
